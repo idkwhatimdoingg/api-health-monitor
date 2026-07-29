@@ -87,14 +87,10 @@ def check_api(api):
 
 
 
-def main():
-
-    # Create SQLite database if it does not exist
-    create_database()
-
+def run_monitor():
 
     print("==========================")
-    print(" API Health Monitor ")
+    print("Running API health check")
     print("==========================")
 
 
@@ -112,6 +108,16 @@ def main():
         print("HTTP:", result["status_code"])
         print("Latency:", result["latency"], "ms")
         print("Checked:", result["time"])
+
+
+
+def main():
+
+    # Create SQLite database if it does not exist
+    create_database()
+
+    # Run one manual check
+    run_monitor()
 
 
 
