@@ -8,18 +8,6 @@ The project was built to demonstrate practical backend development, REST API des
 
 ---
 
-## Screenshot
-
-*Add a screenshot of your dashboard here*
-
-Example:
-
-```
-[ Dashboard Screenshot ]
-```
-
----
-
 # Features
 
 ## API Monitoring
