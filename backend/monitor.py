@@ -26,19 +26,19 @@ def get_apis():
 
     rows = cursor.fetchall()
 
+
     connection.close()
 
 
     return [
-
         {
             "name": row[0],
             "url": row[1]
         }
 
         for row in rows
-
     ]
+
 
 
 
@@ -151,6 +151,7 @@ def check_api(api):
 
 
 
+
 def run_monitor():
 
     print("==========================")
@@ -160,7 +161,18 @@ def run_monitor():
     print("==========================")
 
 
-    for api in get_apis():
+    apis = get_apis()
+
+
+    if not apis:
+
+        print("No APIs found in database.")
+
+        return
+
+
+
+    for api in apis:
 
 
         result = check_api(api)
@@ -189,14 +201,10 @@ def run_monitor():
 
 def main():
 
-    # Create SQLite database if needed
-
     create_database()
 
-
-    # Run one manual check
-
     run_monitor()
+
 
 
 

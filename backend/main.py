@@ -15,7 +15,9 @@ app = FastAPI(
 )
 
 
-# Allow frontend communication
+# -----------------------------
+# CORS
+# -----------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,21 +29,23 @@ app.add_middleware(
 
 DATABASE = "health.db"
 
-
 scheduler = BackgroundScheduler()
 
 
+
+# -----------------------------
+# Startup / Shutdown
+# -----------------------------
 
 @app.on_event("startup")
 def startup_event():
 
     create_database()
 
-    # Run first health check immediately
+    # Run first check immediately
     run_monitor()
 
 
-    # Run checks every 60 seconds
     scheduler.add_job(
         run_monitor,
         "interval",
@@ -60,6 +64,10 @@ def shutdown_event():
 
 
 
+# -----------------------------
+# Home
+# -----------------------------
+
 @app.get("/")
 def home():
 
@@ -70,7 +78,22 @@ def home():
 
 
 # -----------------------------
-# Health Status
+# Manual Monitor Trigger
+# -----------------------------
+
+@app.post("/api/monitor/run")
+def manual_monitor():
+
+    run_monitor()
+
+    return {
+        "message": "Health checks completed"
+    }
+
+
+
+# -----------------------------
+# Latest API Status
 # -----------------------------
 
 @app.get("/api/status")
@@ -82,43 +105,59 @@ def get_status():
 
 
     cursor.execute("""
-        SELECT name, status, status_code, latency, checked_at
+        SELECT
+            api_endpoints.id,
+            api_checks.name,
+            api_checks.status,
+            api_checks.status_code,
+            api_checks.latency,
+            api_checks.checked_at
+
         FROM api_checks
-        ORDER BY id DESC
+
+        LEFT JOIN api_endpoints
+
+        ON api_checks.name = api_endpoints.name
+
+        WHERE api_checks.id IN (
+
+            SELECT MAX(id)
+
+            FROM api_checks
+
+            GROUP BY name
+
+        )
+
+        ORDER BY api_checks.id DESC
     """)
 
 
     rows = cursor.fetchall()
 
+
     connection.close()
 
 
-    results = []
+    return [
 
+        {
+            "id": row[0],
+            "name": row[1],
+            "status": row[2],
+            "status_code": row[3],
+            "latency": row[4],
+            "checked_at": row[5]
+        }
 
-    for row in rows:
+        for row in rows
 
-        results.append({
-
-            "name": row[0],
-
-            "status": row[1],
-
-            "status_code": row[2],
-
-            "latency": row[3],
-
-            "checked_at": row[4]
-
-        })
-
-
-    return results
+    ]
 
 
 
 # -----------------------------
-# History
+# API History
 # -----------------------------
 
 @app.get("/api/history/{api_name}")
@@ -131,9 +170,13 @@ def get_history(api_name: str):
 
     cursor.execute("""
         SELECT checked_at, latency, status
+
         FROM api_checks
+
         WHERE name = ?
+
         ORDER BY id ASC
+
     """,
     (api_name,))
 
@@ -144,23 +187,17 @@ def get_history(api_name: str):
     connection.close()
 
 
-    results = []
+    return [
 
-
-    for row in rows:
-
-        results.append({
-
+        {
             "time": row[0],
-
             "latency": row[1],
-
             "status": row[2]
+        }
 
-        })
+        for row in rows
 
-
-    return results
+    ]
 
 
 
@@ -178,8 +215,11 @@ def get_uptime(api_name: str):
 
     cursor.execute("""
         SELECT status
+
         FROM api_checks
+
         WHERE name = ?
+
     """,
     (api_name,))
 
@@ -198,12 +238,11 @@ def get_uptime(api_name: str):
         return {
 
             "name": api_name,
-
             "uptime": "No data",
-
-            "checks": 0
+            "total_checks": 0
 
         }
+
 
 
     successful_checks = 0
@@ -226,11 +265,8 @@ def get_uptime(api_name: str):
     return {
 
         "name": api_name,
-
         "uptime": f"{uptime_percentage}%",
-
         "total_checks": total_checks,
-
         "successful_checks": successful_checks
 
     }
@@ -244,7 +280,6 @@ def get_uptime(api_name: str):
 class APIEndpoint(BaseModel):
 
     name: str
-
     url: str
 
 
@@ -259,7 +294,9 @@ def get_endpoints():
 
     cursor.execute("""
         SELECT id, name, url
+
         FROM api_endpoints
+
     """)
 
 
@@ -293,9 +330,13 @@ def add_endpoint(api: APIEndpoint):
 
     cursor.execute("""
         INSERT INTO api_endpoints
-        (name, url)
+        (
+            name,
+            url
+        )
 
         VALUES (?, ?)
+
     """,
     (
         api.name,
@@ -306,6 +347,10 @@ def add_endpoint(api: APIEndpoint):
     connection.commit()
 
     connection.close()
+
+
+    # Immediately check new API
+    run_monitor()
 
 
     return {
@@ -325,10 +370,50 @@ def delete_endpoint(api_id: int):
 
 
     cursor.execute("""
-        DELETE FROM api_endpoints
+        SELECT name
+
+        FROM api_endpoints
+
         WHERE id = ?
+
     """,
     (api_id,))
+
+
+    result = cursor.fetchone()
+
+
+    if not result:
+
+        connection.close()
+
+        return {
+
+            "message": "API not found"
+
+        }
+
+
+
+    api_name = result[0]
+
+
+    cursor.execute("""
+        DELETE FROM api_endpoints
+
+        WHERE id = ?
+
+    """,
+    (api_id,))
+
+
+    cursor.execute("""
+        DELETE FROM api_checks
+
+        WHERE name = ?
+
+    """,
+    (api_name,))
 
 
     connection.commit()

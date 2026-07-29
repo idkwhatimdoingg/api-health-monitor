@@ -1,69 +1,177 @@
 body {
+
     font-family: Arial, sans-serif;
+
     background: #f4f4f4;
-    padding: 40px;
+
+    padding: 30px;
+
 }
+
 
 
 h1 {
+
     text-align: center;
-}
-
-
-#dashboard {
-
-    max-width: 800px;
-    margin: auto;
 
 }
 
 
-.card {
+
+#api-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    padding: 20px;
+}
+
+
+
+.api-card {
+    width: 800px;
+    height: 130px;
 
     background: white;
+
+    border-radius: 16px;
+
     padding: 20px;
-    margin: 15px 0;
 
-    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
+    transition: 0.2s ease;
 }
 
 
-.operational {
-    color: green;
+.api-card:hover {
+    transform: translateY(-3px);
+}
+
+
+.api-card h2 {
+    font-size: 20px;
+
+    margin: 0 0 10px 0;
+}
+
+
+.api-card p {
+    margin: 4px 0;
+
+    font-size: 14px;
+}
+
+
+.healthy {
+    color: #16a34a;
+
+    font-weight: bold;
 }
 
 
 .warning {
-    color: orange;
+    color: #ca8a04;
+
+    font-weight: bold;
 }
 
 
-.down {
-    color: red;
-}
-canvas {
+.danger {
+    color: #dc2626;
 
-    max-width: 900px;
-
-    margin: 40px auto;
-
-    display: block;
-
+    font-weight: bold;
 }
 
+.add-api,
+.remove-api {
 
-.card h2 {
+    width: 800px;
 
-    margin-bottom: 10px;
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 20px;
+
+    margin: 20px auto;
+
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
 
 }
 
 
-.card p {
+.add-api h2,
+.remove-api h2 {
 
-    margin: 5px;
+    margin-top: 0;
+
+}
+
+
+.add-api input,
+.remove-api input {
+
+    width: 30%;
+
+    padding: 10px;
+
+    margin-right: 10px;
+
+    border-radius: 8px;
+
+    border: 1px solid #ccc;
+
+}
+
+
+.add-api button,
+.remove-api button {
+
+    padding: 10px 20px;
+
+    border-radius: 8px;
+
+    border: none;
+
+    cursor: pointer;
+
+    background: #2563eb;
+
+    color: white;
+
+}
+
+
+.remove-api button {
+
+    background: #dc2626;
+
+}
+
+
+button:hover {
+
+    
+
+    transform: translateY(-2px);
+transition: 0.2s ease;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+
+}
+
+
+/* Click effect */
+
+button:active {
+
+    transform: scale(0.95);
+
+    box-shadow: none;
 
 }

@@ -1,17 +1,82 @@
-<!doctype html>
-<html>
-  <head>
-    <title>API Health Dashboard</title>
+<meta charset="UTF-8">
 
-    <link rel="stylesheet" href="style.css" />
-  </head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <body>
-    <h1>API Health Dashboard</h1>
+<title>API Health Dashboard</title>
 
-    <div id="dashboard">Loading...</div>
+<link rel="stylesheet" href="style.css">
 
-    <script src="app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </body>
-</html>
+
+<h1>
+    API Health Dashboard
+</h1>
+
+
+
+<div class="add-api">
+
+    <h2>
+        Add API
+    </h2>
+    <p>Example:
+        Name: GitHub API |
+        URL: https://api.github.com</p>
+
+
+    <div class="add-api-form">
+
+        <input
+            id="api-name"
+            placeholder="API Name"
+        >
+
+
+        <input
+            id="api-url"
+            placeholder="API URL"
+        >
+
+
+        <button onclick="addAPI()">
+            Add API
+        </button>
+
+    </div>
+
+</div>
+<div class="remove-api">
+
+    <h2>
+        Remove API
+    </h2>
+
+    <p class="api-example">
+        Enter API ID from the database (example: 1)
+    </p>
+
+
+    <input
+        id="api-id"
+        placeholder="API ID"
+    >
+
+
+    <button onclick="removeAPI()">
+        Remove API
+    </button>
+
+</div>
+
+
+<div id="api-container">
+
+</div>
+
+
+<p class="api-docs">
+    Backend API documentation:
+    <a href="http://127.0.0.1:8000/docs" target="_blank">
+        Swagger UI
+    </a>
+</p>
+<script src="app.js"></script>

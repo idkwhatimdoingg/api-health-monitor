@@ -1,8 +1,6 @@
 import sqlite3
 
-
 DATABASE = "health.db"
-
 
 
 def create_database():
@@ -44,6 +42,56 @@ def create_database():
 
         )
     """)
+
+
+    # Check if APIs already exist
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM api_endpoints
+    """)
+
+
+    count = cursor.fetchone()[0]
+
+
+    # Add default APIs only on first setup
+    if count == 0:
+
+        default_apis = [
+
+            (
+                "Google API",
+                "https://www.google.com"
+            ),
+
+            (
+                "Discord API",
+                "https://discord.com/api/v10"
+            ),
+
+            (
+                "JSONPlaceholder API",
+                "https://jsonplaceholder.typicode.com/posts"
+            ),
+
+            (
+                "NPM Registry API",
+                "https://registry.npmjs.org/"
+            )
+
+        ]
+
+
+        cursor.executemany("""
+            INSERT INTO api_endpoints
+            (
+                name,
+                url
+            )
+
+            VALUES (?, ?)
+
+        """, default_apis)
 
 
     connection.commit()
