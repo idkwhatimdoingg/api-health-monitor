@@ -152,10 +152,9 @@ api-health-monitor/
 ## 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/api-health-monitor.git
+git clone https://github.com/idkwhatimdoingg/api-health-monitor.git
 
 cd api-health-monitor
-```
 
 ---
 
