@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 import sqlite3
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -12,10 +14,20 @@ app = FastAPI(
 )
 
 
+# Allow frontend to communicate with backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 DATABASE = "health.db"
 
 
 scheduler = BackgroundScheduler()
+
 
 
 @app.on_event("startup")
@@ -23,15 +35,17 @@ def startup_event():
 
     create_database()
 
-    # Run immediately when server starts
+    # Run first health check immediately
     run_monitor()
 
-    # Then repeat every 60 seconds
+
+    # Run health checks every 60 seconds
     scheduler.add_job(
         run_monitor,
         "interval",
         seconds=60
     )
+
 
     scheduler.start()
 
@@ -60,11 +74,13 @@ def get_status():
 
     cursor = connection.cursor()
 
+
     cursor.execute("""
         SELECT name, status, status_code, latency, checked_at
         FROM api_checks
         ORDER BY id DESC
     """)
+
 
     rows = cursor.fetchall()
 
@@ -73,14 +89,21 @@ def get_status():
 
     results = []
 
+
     for row in rows:
 
         results.append({
+
             "name": row[0],
+
             "status": row[1],
+
             "status_code": row[2],
+
             "latency": row[3],
+
             "checked_at": row[4]
+
         })
 
 
