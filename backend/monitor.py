@@ -1,6 +1,7 @@
 import requests
 import time
 from datetime import datetime
+from database import create_database, save_check
 
 
 APIS = [
@@ -43,7 +44,7 @@ def check_api(api):
 
         status_code = response.status_code
 
-        # Determine API health
+
         if status_code < 300:
             status = "Operational ✅"
 
@@ -88,6 +89,10 @@ def check_api(api):
 
 def main():
 
+    # Create SQLite database if it does not exist
+    create_database()
+
+
     print("==========================")
     print(" API Health Monitor ")
     print("==========================")
@@ -97,12 +102,17 @@ def main():
 
         result = check_api(api)
 
+        # Save result into SQLite
+        save_check(result)
+
+
         print("\n----------------")
         print(result["name"])
         print("Status:", result["status"])
         print("HTTP:", result["status_code"])
         print("Latency:", result["latency"], "ms")
         print("Checked:", result["time"])
+
 
 
 if __name__ == "__main__":
