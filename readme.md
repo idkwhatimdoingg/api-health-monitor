@@ -222,12 +222,16 @@ http://127.0.0.1:8000/docs
 
 ## Start Frontend
 
-Open:
 
 ```
-frontend/index.html
-```
+cd frontend
+python -m http.server 5500
 
+```
+Then open:
+```
+http://localhost:5500
+```
 in your browser.
 
 The frontend communicates with the FastAPI backend.
